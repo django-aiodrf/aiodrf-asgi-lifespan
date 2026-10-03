@@ -1,0 +1,77 @@
+[build-system]
+requires = ["hatchling>=1.27"]
+build-backend = "hatchling.build"
+
+[project]
+name = "aiodrf-asgi-lifespan"
+version = "0.1.0"
+description = "ASGI lifespan contexts and typed resource access for Django."
+readme = "README.md"
+license = "BSD-3-Clause"
+license-files = ["LICENSE", "NOTICE"]
+requires-python = ">=3.12"
+dependencies = ["Django>=5.2", "asgiref>=3.8.1"]
+keywords = ["django", "asgi", "lifespan", "asyncio"]
+authors = [{ name = "ctolon", email = "cevatbatuhan.tolon@gmail.com" }]
+classifiers = [
+  "Development Status :: 3 - Alpha",
+  "Environment :: Web Environment",
+  "Framework :: AsyncIO",
+  "Framework :: Django",
+  "Framework :: Django :: 5.2",
+  "Framework :: Django :: 6.0",
+  "Framework :: Django :: 6.1",
+  "Intended Audience :: Developers",
+  "Operating System :: OS Independent",
+  "Programming Language :: Python :: 3 :: Only",
+  "Programming Language :: Python :: 3.12",
+  "Programming Language :: Python :: 3.13",
+  "Programming Language :: Python :: 3.14",
+  "Topic :: Internet :: WWW/HTTP",
+  "Typing :: Typed",
+]
+
+[project.urls]
+Homepage = "https://github.com/django-aiodrf/aiodrf-asgi-lifespan"
+Repository = "https://github.com/django-aiodrf/aiodrf-asgi-lifespan"
+Issues = "https://github.com/django-aiodrf/aiodrf-asgi-lifespan/issues"
+Changelog = "https://github.com/django-aiodrf/aiodrf-asgi-lifespan/blob/main/CHANGELOG.md"
+
+[project.optional-dependencies]
+
+[dependency-groups]
+dev = ["pytest>=8", "pytest-django>=4.9", "pytest-asyncio>=0.24", "ruff>=0.13", "mypy>=1.14", "django-stubs>=5.2", "pytest-cov>=6", "build>=1.2", "twine>=6", "hatchling>=1.27", "nox>=2024.10"]
+
+[tool.hatch.build.targets.wheel]
+packages = ["src/aiodrf_asgi_lifespan"]
+
+[tool.hatch.build.targets.sdist]
+include = ["/src", "/tests", "/tools", "/pyproject.toml", "/noxfile.py", "/*.md", "/LICENSE", "/NOTICE"]
+
+[tool.pytest.ini_options]
+DJANGO_SETTINGS_MODULE = "tests.settings"
+pythonpath = [".", "src"]
+testpaths = ["tests"]
+asyncio_mode = "auto"
+asyncio_default_fixture_loop_scope = "function"
+filterwarnings = ["error"]
+markers = ["unit: no external service", "integration: external services or installed consumer"]
+
+[tool.ruff]
+line-length = 88
+target-version = "py312"
+
+[tool.ruff.lint]
+select = ["E", "F", "I", "UP", "B", "DJ", "ASYNC"]
+ignore = ["E501", "B904"]
+
+[tool.mypy]
+files = ["src/aiodrf_asgi_lifespan"]
+python_version = "3.12"
+check_untyped_defs = true
+disallow_untyped_defs = true
+warn_unused_ignores = true
+
+[[tool.mypy.overrides]]
+module = ["django_valkey.*", "valkey.*"]
+ignore_missing_imports = true
