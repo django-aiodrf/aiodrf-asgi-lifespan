@@ -4,6 +4,24 @@ All notable changes to this project are documented in this file. The format
 follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/), and the
 project uses [Semantic Versioning](https://semver.org/).
 
+## [0.1.1] - 2026-10-03
+
+### Added
+
+- Tests against real ASGI servers: Uvicorn, Granian and Hypercorn run a
+  Django project as processes in the `servers` nox session and CI job.
+- README: the order in which Django runs `asgi_startup` and `asgi_shutdown`
+  receivers on each supported Django version, how failing receivers are
+  reported, and the tested servers. Daphne 4.2.3 is listed as unsupported:
+  it does not implement the lifespan protocol.
+
+### Changed
+
+- Annotations: `resolve_lifespan()` and `get_lifespan_factory()` return
+  `LifespanFactory[object] | None`, and the `lifespan` argument of
+  `get_asgi_application()` is typed as `str | LifespanFactory[object] |
+  None`. Runtime behaviour is unchanged.
+
 ## [0.1.0] - 2026-10-03
 
 The first release, extracted from django-aiodrf 0.0.2 so that projects that

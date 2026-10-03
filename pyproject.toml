@@ -4,7 +4,7 @@ build-backend = "hatchling.build"
 
 [project]
 name = "aiodrf-asgi-lifespan"
-version = "0.1.0"
+version = "0.1.1"
 description = "ASGI lifespan contexts and typed resource access for Django."
 readme = "README.md"
 license = "BSD-3-Clause"
@@ -46,7 +46,7 @@ dev = ["pytest>=8", "pytest-django>=4.9", "pytest-asyncio>=0.24", "ruff>=0.13", 
 packages = ["src/aiodrf_asgi_lifespan"]
 
 [tool.hatch.build.targets.sdist]
-include = ["/src", "/tests", "/tools", "/pyproject.toml", "/noxfile.py", "/*.md", "/LICENSE", "/NOTICE"]
+include = ["/src", "/tests", "/tools", "/requirements", "/pyproject.toml", "/noxfile.py", "/*.md", "/LICENSE", "/NOTICE"]
 
 [tool.pytest.ini_options]
 DJANGO_SETTINGS_MODULE = "tests.settings"
@@ -66,7 +66,7 @@ select = ["E", "F", "I", "UP", "B", "DJ", "ASYNC"]
 ignore = ["E501", "B904"]
 
 [tool.mypy]
-files = ["src/aiodrf_asgi_lifespan"]
+files = ["src/aiodrf_asgi_lifespan", "tests/typing_checks.py"]
 python_version = "3.12"
 check_untyped_defs = true
 disallow_untyped_defs = true

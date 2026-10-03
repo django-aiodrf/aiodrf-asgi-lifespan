@@ -1,0 +1,6 @@
+# ASGI servers that tests/live runs the package under, and the client that
+# polls them. The minimums are the versions the README lists as tested.
+granian>=2.8.3
+httpx>=0.28
+hypercorn>=0.18
+uvicorn>=0.54

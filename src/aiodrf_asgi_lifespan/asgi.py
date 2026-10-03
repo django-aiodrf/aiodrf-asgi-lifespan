@@ -1,5 +1,6 @@
 """ASGI lifespan resources owned by one server event loop."""
 
+import enum
 import traceback
 from collections.abc import Awaitable, Callable
 from contextlib import AbstractAsyncContextManager, AsyncExitStack
@@ -16,7 +17,14 @@ from .settings import get_lifespan_factory, resolve_lifespan
 from .signals import asgi_shutdown, asgi_startup
 
 type LifespanFactory[T] = Callable[[], AbstractAsyncContextManager[T]]
-_UNSET = object()
+
+
+class _Unset(enum.Enum):
+    # A one-member enum, so that type checkers narrow ``lifespan is _UNSET``.
+    UNSET = enum.auto()
+
+
+_UNSET = _Unset.UNSET
 _STATE_KEY = "aiodrf_asgi_lifespan.state"
 __all__ = [
     "LifespanApplication",
@@ -198,7 +206,9 @@ class LifespanApplication:
             await send({"type": "lifespan.shutdown.complete"})
 
 
-def get_asgi_application(*, lifespan: Any = _UNSET) -> LifespanApplication:
+def get_asgi_application(
+    *, lifespan: str | LifespanFactory[object] | None | _Unset = _UNSET
+) -> LifespanApplication:
     """Wrap Django; explicit None disables DJANGO_LIFESPAN."""
     application = django_application()
     factory = (

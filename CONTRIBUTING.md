@@ -23,6 +23,7 @@ group, which includes the test tools, ruff, mypy and nox.
 uv run pytest                    # the test suite; warnings are errors
 uv run nox -s lint typecheck     # ruff check, ruff format --check, mypy
 uv run nox -s distribution       # the built wheel, installed alone, tested
+uv run nox -s servers            # tests/live under Uvicorn, Granian and Hypercorn
 ```
 
 `uv run nox -s tests` runs the suite on Python 3.12, 3.13 and 3.14 with

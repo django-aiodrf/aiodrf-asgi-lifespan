@@ -23,6 +23,13 @@ def tests(session, django):
     session.run("pytest", *session.posargs)
 
 
+@nox.session(python="3.14")
+def servers(session):
+    install(session, "6.1")
+    session.install("-r", "requirements/servers.txt")
+    session.run("pytest", "tests/live", *session.posargs)
+
+
 @nox.session
 def lint(session):
     session.install("ruff")
