@@ -50,7 +50,8 @@ os.environ.setdefault("DJANGO_SETTINGS_MODULE", "project.settings")
 application = get_asgi_application()
 ```
 
-The ASGI server must support the lifespan protocol and `scope["state"]`. Each
+The ASGI server must support the lifespan protocol and `scope["state"]` (see
+[Servers](#servers)). Each
 server process, and each event loop, enters its own context. Requests receive
 a shallow copy of the server's state, so the resources themselves are shared
 within the lifespan.
@@ -84,6 +85,54 @@ It accepts Django and DRF requests.
   context is entered, shutdown receivers before it is closed. A failure in
   either is reported to the server. The signals work without a resource
   context too.
+
+## Order of signal receivers
+
+Receivers of `asgi_startup` and `asgi_shutdown` must not depend on each
+other's order. Django runs async receivers concurrently. Django 5.2 and 6.0
+also run the sync receivers, one after another, concurrently with them, while
+Django 6.1 runs the sync receivers first. Every failing receiver is logged by the
+`django.dispatch` logger; the first failure is raised and reported to the
+server.
+
+Resources that depend on each other belong in the lifespan context, opened in
+order with `contextlib.AsyncExitStack` and closed in reverse order:
+
+```python
+# project/lifecycle.py
+from contextlib import AsyncExitStack, asynccontextmanager
+from dataclasses import dataclass
+
+
+@dataclass
+class Resources:
+    database: Database
+    service: Service
+
+
+@asynccontextmanager
+async def resources():
+    # connect_database() and Service stand for the project's async clients.
+    async with AsyncExitStack() as stack:
+        database = await stack.enter_async_context(connect_database())
+        service = await stack.enter_async_context(Service(database))
+        yield Resources(database=database, service=service)
+```
+
+## Servers
+
+The package's CI runs a Django project under these servers, each as a
+process, and checks startup and shutdown order, the shared resource, a failed
+startup and, for Uvicorn, one context per worker process:
+
+- Uvicorn 0.54.0 or later, with `--lifespan on`;
+- Granian 2.8.3 or later, with `--interface asgi`;
+- Hypercorn 0.18.0 or later.
+
+Daphne 4.2.3 does not implement the lifespan protocol. Under Daphne the
+context is never entered, `asgi_startup` and `asgi_shutdown` are never sent,
+and `get_lifespan_state()` raises `ImproperlyConfigured` ("No active lifespan
+state. ...").
 
 ## Testing
 
